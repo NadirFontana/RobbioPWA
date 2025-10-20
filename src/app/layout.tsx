@@ -16,15 +16,11 @@ export const metadata: Metadata = {
   title: "Palio di Robbio",
   description: "Sito ufficiale del Palio di Robbio",
   manifest: "/manifest.json",
-  themeColor: "#000000",
+  themeColor: "transparent",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: "Palio di Robbio"
-  },
-  other: {
-    "mobile-web-app-capable": "yes",
-    "apple-mobile-web-app-capable": "yes"
   },
   viewport: {
     width: "device-width",
