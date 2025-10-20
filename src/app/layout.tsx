@@ -20,7 +20,11 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Palio di Robbio",
+    title: "Palio di Robbio"
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes"
   },
   viewport: {
     width: "device-width",
