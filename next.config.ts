@@ -2,13 +2,20 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   eslint: {
-    ignoreDuringBuilds: true, // Disabilita completamente ESLint durante il build
-    // Oppure per disabilitare regole specifiche:
-    // rules: {
-    //   'react/no-unescaped-entities': 'off',
-    //   '@next/next/no-img-element': 'off'
-    // }
-  }
+    ignoreDuringBuilds: true,
+  },
+  output: 'export',  // Necessario per static export
+  images: {
+    unoptimized: true,  // Necessario per Netlify
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+    ],
+  },
+  assetPrefix: './', // Aiuta con i percorsi delle risorse statiche
+  trailingSlash: true, // Aiuta con la navigazione
 };
 
 export default nextConfig;
