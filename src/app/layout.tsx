@@ -16,27 +16,18 @@ export const metadata: Metadata = {
   title: "Palio di Robbio",
   description: "Sito ufficiale del Palio di Robbio",
   manifest: "/manifest.json",
-  themeColor: "#000000",
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover',
+  },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black",
-    title: "Palio di Robbio",
-    startupImage: [
-      {
-        url: "/splash.png",
-        media: "(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
-      }
-    ]
+    statusBarStyle: 'black-translucent',
+    startupImage: [],
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    minimumScale: 1,
-    userScalable: false,
-    viewportFit: "cover"
-  },
-};
+  themeColor: '#000000',
+}
 
 export default function RootLayout({
   children,
