@@ -58,7 +58,9 @@ body {
   right: 0;
   bottom: 0;
   font-family: var(--font-sans), system-ui, sans-serif;
-  padding: var(--sat) var(--sar) var(--sab) var(--sal);
   display: flex;
   flex-direction: column;
+  /* Estendere il contenuto sotto le barre di sistema */
+  padding: 0;
+  margin: 0;
 }

@@ -39,16 +39,16 @@ export default function RootLayout({
   return (
     <html lang="it" suppressHydrationWarning className="h-full">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, minimal-ui" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, minimal-ui, user-scalable=no" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="transparent" />
+        <meta name="theme-color" content="#000000" />
         <meta name="apple-mobile-web-app-title" content="Robbio" />
         <meta name="apple-touch-fullscreen" content="yes" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased overscroll-none`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased overscroll-none bg-black`}>
         <main className="scroll-container">
           {children}
         </main>
