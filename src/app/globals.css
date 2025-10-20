@@ -15,32 +15,8 @@
   --color-foreground: #ededed;
 }
 
-:root {
-  --sat: env(safe-area-inset-top);
-  --sab: env(safe-area-inset-bottom);
-  --sal: env(safe-area-inset-left);
-  --sar: env(safe-area-inset-right);
-}
-
-html {
-  height: 100vh;
-  height: -webkit-fill-available;
-}
-
 body {
   background: var(--color-background);
   color: var(--color-foreground);
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
-  margin: 0;
-  padding: 0;
-  overscroll-behavior: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100vw;
-  height: 100vh;
   font-family: Arial, Helvetica, sans-serif;
 }
