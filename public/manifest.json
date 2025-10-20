@@ -4,8 +4,10 @@
   "description": "Robbio Progressive Web App",
   "start_url": "/",
   "display": "fullscreen",
-  "background_color": "#ffffff",
+  "display_override": ["fullscreen"],
+  "background_color": "#000000",
   "theme_color": "#000000",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icon-192x192.png",
