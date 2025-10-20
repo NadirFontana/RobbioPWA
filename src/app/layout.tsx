@@ -19,12 +19,14 @@ export const metadata: Metadata = {
   viewport: {
     width: 'device-width',
     initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
     viewportFit: 'cover',
   },
   themeColor: '#000000',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
+    statusBarStyle: 'default',
     title: "Palio di Robbio",
   },
 };

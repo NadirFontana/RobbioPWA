@@ -32,7 +32,15 @@ body {
   color: var(--color-foreground);
   min-height: 100vh;
   min-height: -webkit-fill-available;
-  padding: var(--sat) var(--sar) var(--sab) var(--sal);
+  margin: 0;
+  padding: 0;
   overscroll-behavior: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
   font-family: Arial, Helvetica, sans-serif;
 }
