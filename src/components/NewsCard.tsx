@@ -1,4 +1,5 @@
 import { News } from '../types/news';
+import Image from 'next/image';
 
 interface NewsCardProps {
   news: News;
@@ -19,10 +20,12 @@ export default function NewsCard({ news }: NewsCardProps) {
       <div className="md:flex">
         {/* Immagine */}
         <div className="md:w-1/3 h-64 md:h-auto">
-          <img 
+          <Image 
             src={news.immagine} 
             alt={news.titolo}
             className="w-full h-full object-cover"
+            width={400}
+            height={300}
           />
         </div>
         
