@@ -3,10 +3,11 @@
   "short_name": "Robbio",
   "description": "Robbio Progressive Web App",
   "start_url": "/",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#000000",
   "theme_color": "#000000",
   "orientation": "portrait",
+  "display_override": ["fullscreen", "immersive"],
   "icons": [
     {
       "src": "/icon-192x192.png",
