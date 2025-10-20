@@ -4,6 +4,19 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  headers: async () => {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'viewport-fit',
+            value: 'cover'
+          }
+        ],
+      },
+    ]
+  },
   output: 'export',  // Necessario per static export
   images: {
     unoptimized: true,  // Necessario per Netlify

@@ -15,8 +15,24 @@
   --color-foreground: #ededed;
 }
 
+:root {
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
+}
+
+html {
+  height: 100vh;
+  height: -webkit-fill-available;
+}
+
 body {
   background: var(--color-background);
   color: var(--color-foreground);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  padding: var(--sat) var(--sar) var(--sab) var(--sal);
+  overscroll-behavior: none;
   font-family: Arial, Helvetica, sans-serif;
 }

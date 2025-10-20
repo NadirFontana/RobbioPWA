@@ -15,6 +15,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Palio di Robbio",
   description: "Sito ufficiale del Palio di Robbio",
+  manifest: "/manifest.json",
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover',
+  },
+  themeColor: '#000000',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: "Palio di Robbio",
+  },
 };
 
 export default function RootLayout({
