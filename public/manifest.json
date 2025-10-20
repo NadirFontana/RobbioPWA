@@ -5,9 +5,12 @@
   "start_url": "/",
   "display": "fullscreen",
   "background_color": "#000000",
-  "theme_color": "#000000",
+  "theme_color": "transparent",
   "orientation": "portrait",
-  "display_override": ["fullscreen", "immersive"],
+  "display_override": ["window-controls-overlay", "fullscreen"],
+  "categories": ["utilities"],
+  "prefer_related_applications": false,
+  "handle_links": "preferred",
   "icons": [
     {
       "src": "/icon-192x192.png",

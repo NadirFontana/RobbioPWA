@@ -15,8 +15,16 @@
   --color-foreground: #ededed;
 }
 
+:root {
+  --sat: env(safe-area-inset-top);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --sar: env(safe-area-inset-right);
+}
+
 html {
   height: 100%;
+  height: -webkit-fill-available;
 }
 
 body {
@@ -24,21 +32,33 @@ body {
   padding: 0;
   height: 100%;
   width: 100%;
-  overflow-y: auto;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
   background: var(--color-background);
   color: var(--color-foreground);
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Classe per gestire lo scrolling */
-.scroll-container {
-  height: 100%;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+}
+
+/* Classe per gestire lo scrolling */
+.scroll-container {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   font-family: var(--font-sans), system-ui, sans-serif;
+  padding: var(--sat) var(--sar) var(--sab) var(--sal);
+  display: flex;
+  flex-direction: column;
 }

@@ -37,17 +37,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="it" suppressHydrationWarning>
+    <html lang="it" suppressHydrationWarning className="h-full">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, minimal-ui" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="transparent" />
+        <meta name="apple-mobile-web-app-title" content="Robbio" />
+        <meta name="apple-touch-fullscreen" content="yes" />
+        <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <div className="scroll-container">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased overscroll-none`}>
+        <main className="scroll-container">
           {children}
-        </div>
+        </main>
       </body>
     </html>
   );
