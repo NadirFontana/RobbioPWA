@@ -72,7 +72,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
       <Navbar 
         onMenuClick={() => setIsMenuOpen(!isMenuOpen)} 
         isMenuOpen={isMenuOpen}
@@ -94,12 +94,13 @@ export default function Home() {
         onSectionChange={setActiveSection}
       />
 
+      {/* MAIN con grow per riempire lo spazio */}
       <main className="flex-grow">
         {renderSection()}
       </main>
 
-      {/* Footer */}
-      <footer className="text-center py-4 text-sm text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
+      {/* FOOTER sempre in fondo */}
+      <footer className="mt-auto text-center py-4 text-sm text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         © 2025 Palio d'Urmon — Tutti i diritti riservati.
       </footer>
     </div>
