@@ -11,7 +11,7 @@ import Programma2025 from "@/components/Programma2025";
 import Risultati2025 from "@/components/Risultati2025";
 import Gastronomia from "@/components/Gastronomia";
 import Robbio from "@/components/Robbio";
-import MediaSocial from "@/components/MediaSocial";
+import MediaSocial from "@/components/SocialMedia";
 import Contatti from "@/components/Contatti";
 
 export default function Home() {
@@ -94,9 +94,14 @@ export default function Home() {
         onSectionChange={setActiveSection}
       />
 
-      <main>
+      <main className="flex-grow">
         {renderSection()}
       </main>
+
+      {/* Footer */}
+      <footer className="text-center py-4 text-sm text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
+        © 2025 Palio d'Urmon — Tutti i diritti riservati.
+      </footer>
     </div>
   );
 }
