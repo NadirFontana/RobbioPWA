@@ -8,7 +8,7 @@ export default function NewsList() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
       <div className="space-y-8">
         {sortedNews.map((news) => (
           <NewsCard key={news.id} news={news} />
