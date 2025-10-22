@@ -5,6 +5,7 @@ interface SidebarProps {
   onThemeToggle: () => void;
   isDarkMode: boolean;
   onInstall: () => void;
+  isInstallAvailable: boolean;
 }
 
 export default function Sidebar({
@@ -14,6 +15,7 @@ export default function Sidebar({
   onThemeToggle,
   isDarkMode,
   onInstall,
+  isInstallAvailable,
 }: SidebarProps) {
   const menuItems = [
     { name: "Home", section: "home" },
@@ -42,10 +44,7 @@ export default function Sidebar({
       <div className="p-6 h-full flex flex-col justify-between overflow-y-auto">
         <div>
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Menu
-            </h2>
-
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Menu</h2>
             <button
               onClick={onClose}
               className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -115,7 +114,12 @@ export default function Sidebar({
 
           <button
             onClick={onInstall}
-            className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium"
+            disabled={!isInstallAvailable}
+            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
+              isInstallAvailable
+                ? "bg-blue-600 text-white hover:bg-blue-700"
+                : "bg-gray-400 text-gray-200 cursor-not-allowed"
+            }`}
           >
             Installa
           </button>
