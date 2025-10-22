@@ -15,13 +15,21 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Palio di Robbio",
   description: "Sito ufficiale del Palio di Robbio",
-  manifest: "/manifest.json", // 👈 aggiunto
-  themeColor: "#1d4ed8", // 👈 colore tema per PWA e barra browser
+  manifest: "/manifest.json",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" }, // colore navbar light
+    { media: "(prefers-color-scheme: dark)", color: "#111827" }, // colore navbar dark
+  ],
   icons: {
     icon: "/icons/icon-192x192.png",
     apple: "/icons/icon-192x192.png",
   },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+  },
 };
+
 
 export default function RootLayout({
   children,
@@ -31,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="it" suppressHydrationWarning>
       <head>
-        {/* 👇 Queste meta aiutano il supporto PWA su iOS e Android */}
+        {/* 👇 meta PWA */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta
           name="apple-mobile-web-app-status-bar-style"

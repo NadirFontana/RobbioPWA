@@ -35,9 +35,8 @@ export default function Sidebar({
 
   return (
     <aside
-      className={`fixed top-0 right-0 h-full w-80 bg-white dark:bg-gray-800 shadow-xl z-40 transform transition-transform duration-300 ease-in-out ${
-        isOpen ? "translate-x-0" : "translate-x-full"
-      }`}
+      className={`fixed top-0 right-0 h-full w-80 bg-white dark:bg-gray-800 shadow-xl z-40 transform transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
     >
       <div className="p-6 h-full flex flex-col justify-between overflow-y-auto">
         <div>
@@ -116,12 +115,21 @@ export default function Sidebar({
           {/* 👇 Mostra il pulsante Installa solo su mobile */}
           {onInstall && (
             <button
-              onClick={onInstall}
+              onClick={() => {
+                if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad")) {
+                  alert(
+                    "Per installare l'app su iOS, premi il pulsante Condividi in Safari e seleziona 'Aggiungi a Home'."
+                  );
+                } else {
+                  onInstall();
+                }
+              }}
               className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium"
             >
               Installa
             </button>
           )}
+
         </div>
       </div>
     </aside>
