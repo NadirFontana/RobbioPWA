@@ -20,7 +20,7 @@ export default function Home() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
-  // --- Tema scuro
+  // --- Tema scuro ---
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -45,7 +45,7 @@ export default function Home() {
     }
   };
 
-  // --- Gestione PWA install prompt
+  // --- Gestione PWA install prompt ---
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: any) => {
       e.preventDefault();
@@ -53,6 +53,7 @@ export default function Home() {
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
     };
@@ -63,36 +64,44 @@ export default function Home() {
       alert("L'app non è ancora pronta per essere installata.");
       return;
     }
+
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    console.log("Installazione scelta:", outcome);
+
+    if (outcome === "accepted") {
+      console.log("L'utente ha accettato l'installazione");
+    } else {
+      console.log("L'utente ha rifiutato l'installazione");
+    }
+
     setDeferredPrompt(null);
   };
 
-  // --- Hint per iOS
-  useEffect(() => {
-    const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
-    const isInStandaloneMode = "standalone" in window.navigator && window.navigator.standalone;
-
-    if (isIos && !isInStandaloneMode) {
-      console.log("iOS: usa 'Condividi > Aggiungi alla schermata Home' per installare.");
-    }
-  }, []);
-
-  // --- Sezioni
+  // --- Sezioni ---
   const renderSection = () => {
     switch (activeSection) {
-      case "home": return <NewsList />;
-      case "rioni": return <Rioni />;
-      case "albodoro": return <AlboDoro />;
-      case "statistiche": return <Statistiche />;
-      case "programma2025": return <Programma2025 />;
-      case "risultati2025": return <Risultati2025 />;
-      case "gastronomia": return <Gastronomia />;
-      case "robbio": return <Robbio />;
-      case "mediasocial": return <MediaSocial />;
-      case "contatti": return <Contatti />;
-      default: return <NewsList />;
+      case "home":
+        return <NewsList />;
+      case "rioni":
+        return <Rioni />;
+      case "albodoro":
+        return <AlboDoro />;
+      case "statistiche":
+        return <Statistiche />;
+      case "programma2025":
+        return <Programma2025 />;
+      case "risultati2025":
+        return <Risultati2025 />;
+      case "gastronomia":
+        return <Gastronomia />;
+      case "robbio":
+        return <Robbio />;
+      case "mediasocial":
+        return <MediaSocial />;
+      case "contatti":
+        return <Contatti />;
+      default:
+        return <NewsList />;
     }
   };
 
@@ -119,7 +128,6 @@ export default function Home() {
         onThemeToggle={toggleTheme}
         isDarkMode={isDarkMode}
         onInstall={handleInstall}
-        isInstallAvailable={!!deferredPrompt}
       />
 
       <main className="flex-grow">{renderSection()}</main>
