@@ -4,7 +4,7 @@ interface SidebarProps {
   onSectionChange: (section: string) => void;
   onThemeToggle: () => void;
   isDarkMode: boolean;
-  onInstall: () => void;
+  onInstall?: () => void; // 👈 ora è opzionale
 }
 
 export default function Sidebar({
@@ -113,12 +113,15 @@ export default function Sidebar({
             </svg>
           </button>
 
-          <button
-            onClick={onInstall}
-            className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium"
-          >
-            Installa
-          </button>
+          {/* 👇 Mostra il pulsante Installa solo su mobile */}
+          {onInstall && (
+            <button
+              onClick={onInstall}
+              className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium"
+            >
+              Installa
+            </button>
+          )}
         </div>
       </div>
     </aside>

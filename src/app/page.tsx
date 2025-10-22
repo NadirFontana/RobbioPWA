@@ -19,6 +19,15 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState("home");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // --- Rileva se è mobile ---
+  useEffect(() => {
+    const checkMobile = /android|iphone|ipad|ipod/i.test(
+      navigator.userAgent.toLowerCase()
+    );
+    setIsMobile(checkMobile);
+  }, []);
 
   // --- Tema scuro ---
   useEffect(() => {
@@ -35,17 +44,18 @@ export default function Home() {
   }, []);
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    if (isDarkMode) {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    } else {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    if (newMode) {
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
     }
   };
 
-  // --- Gestione PWA install prompt ---
+  // --- Gestione evento installazione PWA ---
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: any) => {
       e.preventDefault();
@@ -59,22 +69,40 @@ export default function Home() {
     };
   }, []);
 
+  // --- Installazione SOLO MOBILE ---
   const handleInstall = async () => {
-    if (!deferredPrompt) {
-      alert("L'app non è ancora pronta per essere installata.");
+    if (!isMobile) return; // desktop → non fa nulla
+
+    const isIos =
+      /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+    const isInStandalone = (window.navigator as any).standalone === true;
+
+    // Safari (iOS)
+    if (isIos && !isInStandalone) {
+      const tip = document.createElement("div");
+      tip.textContent = "👉 Tocca Condividi → Aggiungi alla schermata Home";
+      tip.style.position = "fixed";
+      tip.style.bottom = "80px";
+      tip.style.left = "50%";
+      tip.style.transform = "translateX(-50%)";
+      tip.style.background = "#2563eb";
+      tip.style.color = "white";
+      tip.style.padding = "10px 16px";
+      tip.style.borderRadius = "12px";
+      tip.style.fontSize = "14px";
+      tip.style.boxShadow = "0 2px 10px rgba(0,0,0,0.2)";
+      tip.style.zIndex = "9999";
+      document.body.appendChild(tip);
+      setTimeout(() => tip.remove(), 4000);
       return;
     }
 
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-
-    if (outcome === "accepted") {
-      console.log("L'utente ha accettato l'installazione");
-    } else {
-      console.log("L'utente ha rifiutato l'installazione");
+    // Android / Chrome
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      setDeferredPrompt(null);
     }
-
-    setDeferredPrompt(null);
   };
 
   // --- Sezioni ---
@@ -127,7 +155,7 @@ export default function Home() {
         onSectionChange={setActiveSection}
         onThemeToggle={toggleTheme}
         isDarkMode={isDarkMode}
-        onInstall={handleInstall}
+        onInstall={isMobile ? handleInstall : undefined} // 👈 solo mobile
       />
 
       <main className="flex-grow">{renderSection()}</main>
