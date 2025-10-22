@@ -1,39 +1,34 @@
 import type { NextConfig } from "next";
 
-const withPWA = require("next-pwa")({
-  dest: "public", // dove salvare il service worker
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === "development", // disattiva in sviluppo
-});
-
 const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  headers: async () => [
-    {
-      source: "/:path*",
-      headers: [
-        {
-          key: "viewport-fit",
-          value: "cover",
-        },
-      ],
-    },
-  ],
-  output: "export", // ✅ necessario per static export
+  headers: async () => {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'viewport-fit',
+            value: 'cover'
+          }
+        ],
+      },
+    ]
+  },
+  output: 'export',  // Necessario per static export
   images: {
-    unoptimized: true, // ✅ necessario per Netlify static export
+    unoptimized: true,  // Necessario per Netlify
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "images.unsplash.com",
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
       },
     ],
   },
-  assetPrefix: "./", // ✅ percorsi statici relativi
-  trailingSlash: true, // ✅ migliora la navigazione su static export
+  assetPrefix: './', // Aiuta con i percorsi delle risorse statiche
+  trailingSlash: true, // Aiuta con la navigazione
 };
 
-export default withPWA(nextConfig);
+export default nextConfig;
