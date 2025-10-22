@@ -1,10 +1,12 @@
 {
-  "name": "Palio d'Urmon",
+  "name": "Palio d’Urmon",
   "short_name": "Palio",
-  "start_url": "/",
+  "description": "App ufficiale del Palio d’Urmon — Eventi, notizie e informazioni.",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#2563eb",
+  "theme_color": "#800000",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
