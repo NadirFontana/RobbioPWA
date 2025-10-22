@@ -94,12 +94,12 @@ export default function Home() {
         onSectionChange={setActiveSection}
       />
 
-      {/* MAIN con grow per riempire lo spazio */}
+      {/* Main */}
       <main className="flex-grow">
         {renderSection()}
       </main>
 
-      {/* FOOTER sempre in fondo */}
+      {/* Footer */}
       <footer className="mt-auto text-center py-4 text-sm text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         © 2025 Palio d'Urmon — Tutti i diritti riservati.
       </footer>

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 interface NavbarProps {
   onMenuClick: () => void;
   isMenuOpen: boolean;
@@ -5,24 +7,37 @@ interface NavbarProps {
   isDarkMode: boolean;
 }
 
-export default function Navbar({ onMenuClick, isMenuOpen, onThemeToggle, isDarkMode }: NavbarProps) {
+export default function Navbar({
+  onMenuClick,
+  isMenuOpen,
+  onThemeToggle,
+  isDarkMode,
+}: NavbarProps) {
   return (
     <nav
       className={`fixed top-0 left-0 w-full border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 transition-all ${
-        isMenuOpen ? 'z-10' : 'z-50'
+        isMenuOpen ? "z-10" : "z-50"
       }`}
     >
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo Placeholder */}
-          <div className="flex items-center">
-            <div className="w-32 h-8 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm font-medium">
-              Logo
-            </div>
+          {/* Logo + Titolo */}
+          <div className="flex items-center space-x-3">
+            <Image
+              src="/icon-192.png"
+              alt="Logo Palio d'Urmon"
+              width={40}
+              height={40}
+              priority
+              className="rounded-full"
+            />
+            <span className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-200">
+              Palio d&apos;Urmon
+            </span>
           </div>
 
           <div className="flex items-center">
-            {/* Theme Toggle Button */}
+            {/* Pulsante tema */}
             <button
               onClick={onThemeToggle}
               className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors mr-2"
@@ -52,10 +67,10 @@ export default function Navbar({ onMenuClick, isMenuOpen, onThemeToggle, isDarkM
               </svg>
             </button>
 
-            {/* Burger Button */}
+            {/* Pulsante menu hamburger */}
             <button
               className={`p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-all relative ${
-                isMenuOpen ? 'z-10' : 'z-50'
+                isMenuOpen ? "z-10" : "z-50"
               }`}
               aria-label="Menu"
               onClick={onMenuClick}
