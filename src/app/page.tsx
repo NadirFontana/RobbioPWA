@@ -18,32 +18,66 @@ export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
+  // --- Tema scuro ---
   useEffect(() => {
-    // Check system preference or saved preference
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+    const savedTheme = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
       setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     } else {
       setIsDarkMode(false);
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
   }, []);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
     if (isDarkMode) {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
     } else {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
     }
   };
 
+  // --- Gestione PWA install prompt ---
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) {
+      alert("L'app non è ancora pronta per essere installata.");
+      return;
+    }
+
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+
+    if (outcome === "accepted") {
+      console.log("L'utente ha accettato l'installazione");
+    } else {
+      console.log("L'utente ha rifiutato l'installazione");
+    }
+
+    setDeferredPrompt(null);
+  };
+
+  // --- Sezioni ---
   const renderSection = () => {
     switch (activeSection) {
       case "home":
@@ -73,33 +107,31 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
-      <Navbar 
-        onMenuClick={() => setIsMenuOpen(!isMenuOpen)} 
+      <Navbar
+        onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
         isMenuOpen={isMenuOpen}
         onThemeToggle={toggleTheme}
         isDarkMode={isDarkMode}
       />
 
-      {/* Overlay */}
       {isMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 backdrop-blur-sm bg-white/30 dark:bg-black/30 z-30 transition-all"
           onClick={() => setIsMenuOpen(false)}
         />
       )}
-      
-      <Sidebar 
-        isOpen={isMenuOpen} 
+
+      <Sidebar
+        isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
         onSectionChange={setActiveSection}
+        onThemeToggle={toggleTheme}
+        isDarkMode={isDarkMode}
+        onInstall={handleInstall}
       />
 
-      {/* Main */}
-      <main className="flex-grow">
-        {renderSection()}
-      </main>
+      <main className="flex-grow">{renderSection()}</main>
 
-      {/* Footer */}
       <footer className="mt-auto text-center py-4 text-sm text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         © 2025 Palio d'Urmon — Tutti i diritti riservati.
       </footer>

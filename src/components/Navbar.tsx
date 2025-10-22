@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 interface NavbarProps {
   onMenuClick: () => void;
@@ -36,11 +37,38 @@ export default function Navbar({
             </span>
           </div>
 
-          <div className="flex items-center">
+          {/* Pulsanti lato destro */}
+          <div className="flex items-center space-x-3">
+            {/* Registrati */}
+            <Link
+              href="/registrati"
+              className={`hidden sm:inline-block px-4 py-2 rounded-md text-sm font-medium transition
+                ${
+                  isDarkMode
+                    ? "bg-blue-600 hover:bg-blue-700 text-white"
+                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                }`}
+            >
+              Registrati
+            </Link>
+
+            {/* Accedi */}
+            <Link
+              href="/accedi"
+              className={`hidden sm:inline-block px-4 py-2 rounded-md border text-sm font-medium transition
+                ${
+                  isDarkMode
+                    ? "border-blue-600 text-white hover:bg-blue-600 hover:text-white"
+                    : "border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+                }`}
+            >
+              Accedi
+            </Link>
+
             {/* Pulsante tema */}
             <button
               onClick={onThemeToggle}
-              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors mr-2"
+              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               aria-label="Cambia tema"
             >
               <svg
