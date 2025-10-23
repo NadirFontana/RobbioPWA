@@ -1,27 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Palio di Robbio",
   description: "Sito ufficiale del Palio di Robbio",
-  manifest: "/manifest.json", // 👈 aggiunto
-  themeColor: "#1d4ed8", // 👈 colore tema per PWA e barra browser
+  manifest: "/manifest.json",
   icons: {
-    icon: "/icons/icon-192x192.png",
-    apple: "/icons/icon-192x192.png",
+    icon: "/icon-192.png",
+    apple: "/icon-192.png",
   },
 };
+
+// Next.js 15: themeColor va in generateViewport
+export function generateViewport() {
+  return {
+    themeColor: "#1d4ed8",
+  };
+}
 
 export default function RootLayout({
   children,
@@ -31,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="it" suppressHydrationWarning>
       <head>
-        {/* 👇 Queste meta aiutano il supporto PWA su iOS e Android */}
+        {/* Meta per PWA su iOS/Android */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta
           name="apple-mobile-web-app-status-bar-style"
@@ -40,14 +35,10 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#1d4ed8" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
       </head>
 
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }
