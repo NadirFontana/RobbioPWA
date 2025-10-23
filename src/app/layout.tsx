@@ -37,8 +37,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#1d4ed8" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
 
-        {/* Splash screen per iOS */}
-        {/* Generata manualmente per alcuni dispositivi comuni */}
+        {/* Splash screen per iOS con icona trasparente */}
         <link
           rel="apple-touch-startup-image"
           href="/icon-192-transparent.png"
@@ -51,13 +50,6 @@ export default function RootLayout({
           href="/icon-192-transparent.png"
           media="(device-width: 375px) and (device-height: 812px)
                  and (-webkit-device-pixel-ratio: 3)
-                 and (orientation: portrait)"
-        />
-        <link
-          rel="apple-touch-startup-image"
-          href="/icon-192-transparent.png"
-          media="(device-width: 414px) and (device-height: 896px)
-                 and (-webkit-device-pixel-ratio: 2)
                  and (orientation: portrait)"
         />
         <link
