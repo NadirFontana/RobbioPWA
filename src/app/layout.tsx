@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 // Next.js 15: themeColor va in generateViewport
 export function generateViewport() {
   return {
-    themeColor: "#0ea5e9",
+    themeColor: "#1d4ed8",
   };
 }
 
@@ -34,26 +34,39 @@ export default function RootLayout({
         />
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#0ea5e9" />
+        <meta name="theme-color" content="#1d4ed8" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
 
-        {/* Splash screen iOS */}
+        {/* Splash screen per iOS */}
+        {/* Generata manualmente per alcuni dispositivi comuni */}
         <link
           rel="apple-touch-startup-image"
-          href="/splash-2048x2732.png"
-          media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)"
+          href="/icon-192-transparent.png"
+          media="(device-width: 390px) and (device-height: 844px)
+                 and (-webkit-device-pixel-ratio: 3)
+                 and (orientation: portrait)"
         />
         <link
           rel="apple-touch-startup-image"
-          href="/splash-1536x2048.png"
-          media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)"
+          href="/icon-192-transparent.png"
+          media="(device-width: 375px) and (device-height: 812px)
+                 and (-webkit-device-pixel-ratio: 3)
+                 and (orientation: portrait)"
         />
         <link
           rel="apple-touch-startup-image"
-          href="/splash-1125x2436.png"
-          media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
+          href="/icon-192-transparent.png"
+          media="(device-width: 414px) and (device-height: 896px)
+                 and (-webkit-device-pixel-ratio: 2)
+                 and (orientation: portrait)"
         />
-        {/* Aggiungi altre risoluzioni iOS se necessario */}
+        <link
+          rel="apple-touch-startup-image"
+          href="/icon-192-transparent.png"
+          media="(device-width: 430px) and (device-height: 932px)
+                 and (-webkit-device-pixel-ratio: 3)
+                 and (orientation: portrait)"
+        />
       </head>
 
       <body className="antialiased">{children}</body>
