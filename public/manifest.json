@@ -3,8 +3,8 @@
   "short_name": "Palio",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1d4ed8",
+  "background_color": "#0ea5e9",
+  "theme_color": "#0ea5e9",
   "description": "App ufficiale del Palio d'Urmon di Robbio.",
   "icons": [
     {
