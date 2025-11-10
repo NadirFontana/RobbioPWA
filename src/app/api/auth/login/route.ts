@@ -1,16 +1,19 @@
-import { sql } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
+    const sql = getDb();
     const { identifier, password } = await request.json();
 
-    const users = await sql`
+    const result = await sql`
       SELECT * FROM users 
       WHERE email = ${identifier} OR phone = ${identifier}
     `;
+
+    const users = Array.isArray(result) ? result : [];
 
     if (users.length === 0) {
       return NextResponse.json(
@@ -19,7 +22,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const user = users[0];
+    const user = users[0] as any;
 
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) {

@@ -1,9 +1,10 @@
-import { sql } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
+    const sql = getDb();
     const { email, password, name, phone } = await request.json();
 
     if (!email || !password || !phone) {
@@ -21,7 +22,9 @@ export async function POST(request: Request) {
       RETURNING id, email, phone, name, role
     `;
 
-    return NextResponse.json(result[0], { status: 201 });
+    const users = Array.isArray(result) ? result : [];
+
+    return NextResponse.json(users[0], { status: 201 });
   } catch (error: any) {
     if (error.code === '23505') {
       if (error.detail?.includes('email')) {

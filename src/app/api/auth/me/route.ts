@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { sql } from '@/lib/db';
+import { getDb } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
+    const sql = getDb();
     const token = request.cookies.get('auth-token')?.value;
 
     if (!token) {
@@ -13,11 +14,13 @@ export async function GET(request: NextRequest) {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
 
-    const users = await sql`
+    const result = await sql`
       SELECT id, email, phone, name, role 
       FROM users 
       WHERE id = ${decoded.userId}
     `;
+
+    const users = Array.isArray(result) ? result : [];
 
     if (users.length === 0) {
       return NextResponse.json({ error: 'Utente non trovato' }, { status: 404 });

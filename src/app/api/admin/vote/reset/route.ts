@@ -1,11 +1,13 @@
-import { sql } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import { NextResponse } from 'next/server';
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
+    const sql = getDb();
     const token = request.cookies.get('auth-token')?.value;
+    
     if (!token) {
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
     }
@@ -17,7 +19,7 @@ export async function GET(request: NextRequest) {
 
     const { phone } = await request.json();
 
-    const result = await sql`
+    const resetResult = await sql`
       UPDATE voters 
       SET has_voted = false, 
           voted_at = NULL,
@@ -25,6 +27,8 @@ export async function GET(request: NextRequest) {
       WHERE phone = ${phone}
       RETURNING *
     `;
+
+    const result = Array.isArray(resetResult) ? resetResult : [];
 
     if (result.length === 0) {
       return NextResponse.json(

@@ -1,8 +1,9 @@
-import { sql } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
+    const sql = getDb();
     const { phone, name, userId } = await request.json();
 
     if (!phone) {
@@ -12,12 +13,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const existingVoter = await sql`
+    const checkResult = await sql`
       SELECT * FROM voters WHERE phone = ${phone}
     `;
 
+    const existingVoter = Array.isArray(checkResult) ? checkResult : [];
+
     if (existingVoter.length > 0) {
-      const result = await sql`
+      const updateResult = await sql`
         UPDATE voters 
         SET has_voted = true, 
             voted_at = NOW(),
@@ -25,24 +28,29 @@ export async function POST(request: Request) {
         WHERE phone = ${phone}
         RETURNING *
       `;
+      
+      const updated = Array.isArray(updateResult) ? updateResult : [];
+      
       return NextResponse.json({ 
         success: true,
         message: 'Voto registrato',
-        voter: result[0] 
+        voter: updated[0] 
       });
     }
 
     const voterType = userId ? 'registered' : 'guest';
-    const result = await sql`
+    const insertResult = await sql`
       INSERT INTO voters (phone, user_id, name, has_voted, voted_at, voter_type)
       VALUES (${phone}, ${userId || null}, ${name || null}, true, NOW(), ${voterType})
       RETURNING *
     `;
 
+    const inserted = Array.isArray(insertResult) ? insertResult : [];
+
     return NextResponse.json({ 
       success: true,
       message: 'Voto registrato',
-      voter: result[0] 
+      voter: inserted[0] 
     }, { status: 201 });
 
   } catch (error: any) {

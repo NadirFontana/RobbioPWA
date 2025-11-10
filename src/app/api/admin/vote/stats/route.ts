@@ -1,11 +1,13 @@
-import { sql } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import { NextResponse } from 'next/server';
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
   try {
+    const sql = getDb();
     const token = request.cookies.get('auth-token')?.value;
+    
     if (!token) {
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 });
     }
@@ -15,7 +17,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Accesso negato' }, { status: 403 });
     }
 
-    const stats = await sql`
+    const statsResult = await sql`
       SELECT 
         COUNT(*) as total,
         COUNT(*) FILTER (WHERE has_voted = true) as voted,
@@ -25,11 +27,15 @@ export async function GET(request: NextRequest) {
       FROM voters
     `;
 
-    const voters = await sql`
+    const stats = Array.isArray(statsResult) ? statsResult : [];
+
+    const votersResult = await sql`
       SELECT id, phone, name, has_voted, voted_at, voter_type, created_at
       FROM voters
       ORDER BY created_at DESC
     `;
+
+    const voters = Array.isArray(votersResult) ? votersResult : [];
 
     return NextResponse.json({
       stats: stats[0],

@@ -1,8 +1,9 @@
-import { sql } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
+    const sql = getDb();
     const { phone } = await request.json();
 
     if (!phone) {
@@ -12,11 +13,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const voter = await sql`
+    const result = await sql`
       SELECT has_voted, voted_at, name FROM voters WHERE phone = ${phone}
     `;
 
-    if (voter.length === 0) {
+    const voters = Array.isArray(result) ? result : [];
+
+    if (voters.length === 0) {
       return NextResponse.json({ 
         hasVoted: false,
         canVote: true,
@@ -24,11 +27,13 @@ export async function POST(request: Request) {
       });
     }
 
+    const voter = voters[0] as any;
+
     return NextResponse.json({ 
-      hasVoted: voter[0].has_voted,
-      canVote: !voter[0].has_voted,
-      votedAt: voter[0].voted_at,
-      name: voter[0].name
+      hasVoted: voter.has_voted,
+      canVote: !voter.has_voted,
+      votedAt: voter.voted_at,
+      name: voter.name
     });
 
   } catch (error) {
