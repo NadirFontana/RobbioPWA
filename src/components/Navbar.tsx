@@ -45,7 +45,6 @@ export default function Navbar({
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo + Titolo */}
-          {/* Logo + Titolo */}
           <button
             onClick={() => onSectionChange('home')}
             className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
@@ -90,7 +89,7 @@ export default function Navbar({
 
                 {/* Dropdown Menu */}
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
+                  <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
                     <div className="py-1">
                       <button
                         onClick={() => {
@@ -127,12 +126,12 @@ export default function Navbar({
                 )}
               </div>
             ) : (
-              /* Pulsanti Registrati e Accedi */
+              /* Pulsanti Registrati e Accedi - VISIBILI SU MOBILE */
               <>
                 <button
                   onClick={() => onSectionChange('registrati')}
-                  className={`hidden sm:inline-block px-4 py-2 rounded-md text-sm font-medium transition
-                    ${isDarkMode
+                  className={`px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition
+        ${isDarkMode
                       ? "bg-blue-600 hover:bg-blue-700 text-white"
                       : "bg-blue-500 hover:bg-blue-600 text-white"
                     }`}
@@ -142,8 +141,8 @@ export default function Navbar({
 
                 <button
                   onClick={() => onSectionChange('accedi')}
-                  className={`hidden sm:inline-block px-4 py-2 rounded-md border text-sm font-medium transition
-                    ${isDarkMode
+                  className={`px-3 sm:px-4 py-2 rounded-md border text-sm font-medium transition
+        ${isDarkMode
                       ? "border-blue-600 text-white hover:bg-blue-600 hover:text-white"
                       : "border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
                     }`}
