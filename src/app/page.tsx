@@ -13,6 +13,8 @@ import Gastronomia from "@/components/Gastronomia";
 import Robbio from "@/components/Robbio";
 import MediaSocial from "@/components/SocialMedia";
 import Contatti from "@/components/Contatti";
+import RegisterForm from "@/components/RegisterForm";
+import LoginForm from "@/components/LoginForm";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,6 +22,7 @@ export default function Home() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
   // --- Rileva se è mobile ---
   useEffect(() => {
@@ -27,6 +30,22 @@ export default function Home() {
       navigator.userAgent.toLowerCase()
     );
     setIsMobile(checkMobile);
+  }, []);
+
+  // --- Verifica se l'utente è loggato ---
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+        }
+      } catch (error) {
+        console.error('Errore verifica autenticazione:', error);
+      }
+    };
+    checkAuth();
   }, []);
 
   // --- Tema scuro ---
@@ -71,13 +90,11 @@ export default function Home() {
 
   // --- Installazione SOLO MOBILE ---
   const handleInstall = async () => {
-    if (!isMobile) return; // desktop → non fa nulla
+    if (!isMobile) return;
 
-    const isIos =
-      /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+    const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
     const isInStandalone = (window.navigator as any).standalone === true;
 
-    // Safari (iOS)
     if (isIos && !isInStandalone) {
       const tip = document.createElement("div");
       tip.textContent = "👉 Tocca Condividi → Aggiungi alla schermata Home";
@@ -97,13 +114,27 @@ export default function Home() {
       return;
     }
 
-    // Android / Chrome
     if (deferredPrompt) {
       deferredPrompt.prompt();
       await deferredPrompt.userChoice;
       setDeferredPrompt(null);
     }
   };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      setUser(null);
+      setActiveSection('home');
+    } catch (error) {
+      console.error('Errore logout:', error);
+    }
+  };
+
+  // Scroll in cima quando cambia sezione
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [activeSection]);
 
   // --- Sezioni ---
   const renderSection = () => {
@@ -128,6 +159,14 @@ export default function Home() {
         return <MediaSocial />;
       case "contatti":
         return <Contatti />;
+      case "registrati":
+        return <RegisterForm onSuccess={() => setActiveSection('accedi')} />;
+      case "accedi":
+        return <LoginForm onSuccess={(userData) => { setUser(userData); setActiveSection('home'); }} />;
+      case "profilo":
+        return <div className="p-8 text-center">Pagina Profilo (in sviluppo)</div>;
+      case "admin":
+        return <div className="p-8 text-center">Dashboard Admin (in sviluppo)</div>;
       default:
         return <NewsList />;
     }
@@ -140,6 +179,9 @@ export default function Home() {
         isMenuOpen={isMenuOpen}
         onThemeToggle={toggleTheme}
         isDarkMode={isDarkMode}
+        user={user}
+        onSectionChange={setActiveSection}
+        onLogout={handleLogout}
       />
 
       {isMenuOpen && (
@@ -155,7 +197,7 @@ export default function Home() {
         onSectionChange={setActiveSection}
         onThemeToggle={toggleTheme}
         isDarkMode={isDarkMode}
-        onInstall={isMobile ? handleInstall : undefined} // 👈 solo mobile
+        onInstall={isMobile ? handleInstall : undefined}
       />
 
       <main className="flex-grow">{renderSection()}</main>

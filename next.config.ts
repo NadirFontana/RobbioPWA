@@ -17,7 +17,6 @@ const nextConfig: NextConfig = {
       },
     ]
   },
-  output: 'export',  // Necessario per static export
   images: {
     unoptimized: true,  // Necessario per Netlify
     remotePatterns: [
