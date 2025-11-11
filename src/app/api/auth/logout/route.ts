@@ -4,6 +4,14 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const sql = getDb();
+
+    if (!sql) {
+      return NextResponse.json(
+        { error: 'Database non configurato' },
+        { status: 500 }
+      );
+    }
+
     const { phone } = await request.json();
 
     if (!phone) {

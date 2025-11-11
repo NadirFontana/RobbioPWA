@@ -198,6 +198,8 @@ export default function Home() {
         onThemeToggle={toggleTheme}
         isDarkMode={isDarkMode}
         onInstall={isMobile ? handleInstall : undefined}
+        user={user}
+        onLogout={handleLogout}
       />
 
       <main className="flex-grow">{renderSection()}</main>

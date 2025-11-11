@@ -9,8 +9,10 @@ export function getDb() {
   
   const connectionString = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
   
+  // Durante il build, restituisce null invece di lanciare errore
   if (!connectionString) {
-    throw new Error('DATABASE_URL is not defined');
+    console.warn('DATABASE_URL is not defined');
+    return null as any; // Restituisce null ma TypeScript lo tratta come valido
   }
   
   _sql = neon(connectionString);
