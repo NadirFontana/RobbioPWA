@@ -30,6 +30,7 @@ export default function Sidebar({
     { name: "Robbio", section: "robbio" },
     { name: "Media & Social", section: "mediasocial" },
     { name: "Contatti", section: "contatti" },
+    { name: "Miro's Adventure", section: "mirosadventure" }
   ];
 
   const handleClick = (section: string) => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import NewsList from "@/components/NewsList";
@@ -15,6 +16,12 @@ import MediaSocial from "@/components/SocialMedia";
 import Contatti from "@/components/Contatti";
 import RegisterForm from "@/components/RegisterForm";
 import LoginForm from "@/components/LoginForm";
+
+// Import dinamico per evitare SSR di R3F (Three.js richiede window/WebGL)
+const MirosAdventure = dynamic(
+  () => import("./mirosadventure/page"),
+  { ssr: false }
+);
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -131,9 +138,11 @@ export default function Home() {
     }
   };
 
-  // Scroll in cima quando cambia sezione
+  // Scroll in cima quando cambia sezione (non per la scena 3D — gestisce il proprio spazio)
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    if (activeSection !== "mirosadventure") {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
   }, [activeSection]);
 
   // --- Sezioni ---
@@ -167,46 +176,69 @@ export default function Home() {
         return <div className="p-8 text-center">Pagina Profilo (in sviluppo)</div>;
       case "admin":
         return <div className="p-8 text-center">Dashboard Admin (in sviluppo)</div>;
+      case "mirosadventure":
+        return <MirosAdventure />;
       default:
         return <NewsList />;
     }
   };
 
+  // Per la scena 3D togliamo navbar e footer e lasciamo solo il Canvas
+  const isFullscreen = activeSection === "mirosadventure";
+
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900">
-      <Navbar
-        onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
-        isMenuOpen={isMenuOpen}
-        onThemeToggle={toggleTheme}
-        isDarkMode={isDarkMode}
-        user={user}
-        onSectionChange={setActiveSection}
-        onLogout={handleLogout}
-      />
+      {!isFullscreen && (
+        <Navbar
+          onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
+          isMenuOpen={isMenuOpen}
+          onThemeToggle={toggleTheme}
+          isDarkMode={isDarkMode}
+          user={user}
+          onSectionChange={setActiveSection}
+          onLogout={handleLogout}
+        />
+      )}
 
-      {isMenuOpen && (
+      {!isFullscreen && isMenuOpen && (
         <div
           className="fixed inset-0 backdrop-blur-sm bg-white/30 dark:bg-black/30 z-30 transition-all"
           onClick={() => setIsMenuOpen(false)}
         />
       )}
 
-      <Sidebar
-        isOpen={isMenuOpen}
-        onClose={() => setIsMenuOpen(false)}
-        onSectionChange={setActiveSection}
-        onThemeToggle={toggleTheme}
-        isDarkMode={isDarkMode}
-        onInstall={isMobile ? handleInstall : undefined}
-        user={user}
-        onLogout={handleLogout}
-      />
+      {!isFullscreen && (
+        <Sidebar
+          isOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
+          onSectionChange={setActiveSection}
+          onThemeToggle={toggleTheme}
+          isDarkMode={isDarkMode}
+          onInstall={isMobile ? handleInstall : undefined}
+          user={user}
+          onLogout={handleLogout}
+        />
+      )}
 
-      <main className="flex-grow">{renderSection()}</main>
+      {/* Bottone ESC per tornare indietro dalla scena 3D */}
+      {isFullscreen && (
+        <button
+          onClick={() => setActiveSection("home")}
+          className="fixed top-4 left-4 z-50 bg-black/50 hover:bg-black/70 text-white text-sm px-3 py-2 rounded-lg backdrop-blur-sm transition"
+        >
+          ← Esci
+        </button>
+      )}
 
-      <footer className="mt-auto text-center py-4 text-sm text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-        © 2025 Palio d'Urmon — Tutti i diritti riservati.
-      </footer>
+      <main className={isFullscreen ? "w-full h-screen" : "flex-grow"}>
+        {renderSection()}
+      </main>
+
+      {!isFullscreen && (
+        <footer className="mt-auto text-center py-4 text-sm text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+          © 2025 Palio d'Urmon — Tutti i diritti riservati.
+        </footer>
+      )}
     </div>
   );
 }
