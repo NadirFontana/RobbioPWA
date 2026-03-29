@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 import { JoystickState } from "../characters/Miro";
 
 export type { JoystickState };
@@ -10,14 +10,15 @@ interface Props {
   visible: boolean;
 }
 
-const JOYSTICK_RADIUS = 50;
-const KNOB_RADIUS = 24;
+const JOYSTICK_RADIUS = 55;
+const KNOB_RADIUS = 22;
 
 export default function MobileControls({ onJoystick, onAction, visible }: Props) {
-  const baseRef = useRef<HTMLDivElement>(null);
   const knobRef = useRef<HTMLDivElement>(null);
+  const joystickRef = useRef<HTMLDivElement>(null);
   const touchIdRef = useRef<number | null>(null);
   const centerRef = useRef({ x: 0, y: 0 });
+  const [joystickPos, setJoystickPos] = useState<{ x: number; y: number } | null>(null);
 
   const resetKnob = useCallback(() => {
     if (knobRef.current) {
@@ -25,21 +26,24 @@ export default function MobileControls({ onJoystick, onAction, visible }: Props)
     }
     onJoystick({ x: 0, y: 0 });
     touchIdRef.current = null;
+    setJoystickPos(null);
   }, [onJoystick]);
 
   useEffect(() => {
-    const base = baseRef.current;
-    if (!base) return;
+    if (!visible) return;
 
     const onTouchStart = (e: TouchEvent) => {
-      if (touchIdRef.current !== null) return;
+      // Ignora touch sul tasto azione (destra)
       const touch = e.changedTouches[0];
+      const screenW = window.innerWidth;
+      if (touch.clientX > screenW * 0.6) return; // zona destra = tasto azione
+
+      if (touchIdRef.current !== null) return;
       touchIdRef.current = touch.identifier;
-      const rect = base.getBoundingClientRect();
-      centerRef.current = {
-        x: rect.left + rect.width / 2,
-        y: rect.top + rect.height / 2,
-      };
+
+      // Posiziona il joystick dove hai toccato
+      centerRef.current = { x: touch.clientX, y: touch.clientY };
+      setJoystickPos({ x: touch.clientX, y: touch.clientY });
     };
 
     const onTouchMove = (e: TouchEvent) => {
@@ -81,68 +85,88 @@ export default function MobileControls({ onJoystick, onAction, visible }: Props)
       }
     };
 
-    base.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: true });
     window.addEventListener("touchend", onTouchEnd, { passive: true });
 
     return () => {
-      base.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);
     };
-  }, [onJoystick, resetKnob]);
+  }, [visible, onJoystick, resetKnob]);
 
   if (!visible) return null;
 
   return (
     <>
-      {/* Joystick sinistro */}
-      <div style={{ position: "fixed", bottom: 40, left: 40, zIndex: 100, userSelect: "none", touchAction: "none" }}>
+      {/* Joystick — appare dove tocchi */}
+      {joystickPos && (
         <div
-          ref={baseRef}
+          ref={joystickRef}
           style={{
-            width: JOYSTICK_RADIUS * 2,
-            height: JOYSTICK_RADIUS * 2,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.15)",
-            border: "2px solid rgba(255,255,255,0.4)",
-            position: "relative",
-            backdropFilter: "blur(4px)",
+            position: "fixed",
+            left: joystickPos.x,
+            top: joystickPos.y,
+            transform: "translate(-50%, -50%)",
+            zIndex: 100,
+            pointerEvents: "none",
           }}
         >
+          {/* Base */}
           <div
-            ref={knobRef}
             style={{
-              width: KNOB_RADIUS * 2,
-              height: KNOB_RADIUS * 2,
+              width: JOYSTICK_RADIUS * 2,
+              height: JOYSTICK_RADIUS * 2,
               borderRadius: "50%",
-              background: "rgba(255,255,255,0.6)",
-              border: "2px solid rgba(255,255,255,0.9)",
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
-              pointerEvents: "none",
+              background: "rgba(255,255,255,0.12)",
+              border: "2px solid rgba(255,255,255,0.25)",
+              position: "relative",
+              backdropFilter: "blur(2px)",
             }}
-          />
+          >
+            {/* Levetta */}
+            <div
+              ref={knobRef}
+              style={{
+                width: KNOB_RADIUS * 2,
+                height: KNOB_RADIUS * 2,
+                borderRadius: "50%",
+                background: "rgba(255,255,255,0.35)",
+                border: "2px solid rgba(255,255,255,0.5)",
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+              }}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Tasto azione destro */}
-      <div style={{ position: "fixed", bottom: 40, right: 40, zIndex: 100, userSelect: "none", touchAction: "none" }}>
+      {/* Tasto azione destra — sempre visibile */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: 48,
+          right: 48,
+          zIndex: 100,
+          touchAction: "none",
+          userSelect: "none",
+        }}
+      >
         <button
           onTouchStart={(e) => { e.preventDefault(); onAction(); }}
           style={{
             width: 64,
             height: 64,
             borderRadius: "50%",
-            background: "rgba(99, 179, 237, 0.7)",
-            border: "2px solid rgba(255,255,255,0.6)",
+            background: "rgba(99,179,237,0.4)",
+            border: "2px solid rgba(255,255,255,0.35)",
             color: "white",
-            fontWeight: "bold",
             backdropFilter: "blur(4px)",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -152,8 +176,8 @@ export default function MobileControls({ onJoystick, onAction, visible }: Props)
             WebkitTapHighlightColor: "transparent",
           }}
         >
-          <span style={{ fontSize: 20, lineHeight: 1 }}>💬</span>
-          <span style={{ fontSize: 10, opacity: 0.9 }}>Parla</span>
+          <span style={{ fontSize: 22, lineHeight: 1 }}>💬</span>
+          <span style={{ fontSize: 10, opacity: 0.8 }}>Parla</span>
         </button>
       </div>
     </>
