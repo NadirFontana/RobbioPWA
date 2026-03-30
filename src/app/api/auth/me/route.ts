@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
-import { getDb } from '@/lib/db';
+import { sql } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
-    const sql = getDb();
     const token = request.cookies.get('auth-token')?.value;
 
     if (!token) {

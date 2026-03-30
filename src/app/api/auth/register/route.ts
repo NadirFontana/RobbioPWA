@@ -1,10 +1,9 @@
-import { getDb } from '@/lib/db';
+import { sql } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const sql = getDb();
     const { email, password, name, phone } = await request.json();
 
     if (!email || !password || !phone) {
