@@ -7,6 +7,7 @@ import Link from 'next/link';
 export default function ResetPasswordPage() {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,6 +22,7 @@ export default function ResetPasswordPage() {
     } else {
       setToken(t);
     }
+    setReady(true);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,6 +60,8 @@ export default function ResetPasswordPage() {
       setLoading(false);
     }
   };
+
+  if (!ready) return null;
 
   if (success) {
     return (
@@ -119,7 +123,7 @@ export default function ResetPasswordPage() {
           <button
             type="submit"
             disabled={loading || !token}
-            className="w-full bg-red-700 hover:bg-red-800 text-white font-semibold py-2.5 rounded-lg transition disabled:opacity-50"
+            className="w-full bg-red-700 hover:bg-red-800 text-white font-semibold py-2.5 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Salvataggio...' : 'Reimposta password'}
           </button>
