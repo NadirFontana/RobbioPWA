@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 interface LoginFormProps {
   onSuccess?: (user: any) => void;
@@ -14,43 +15,42 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError('');
-  setLoading(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-  let identifier;
-  
-  if (loginType === 'email') {
-    identifier = email;
-  } else {
-    // Rimuovi tutti gli spazi e aggiungi +39
-    const cleanPhone = phone.replace(/\s/g, '');
-    identifier = `+39${cleanPhone}`;
-  }
+    let identifier;
 
-  try {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ identifier, password })
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      if (onSuccess) {
-        onSuccess(data.user);
-      }
+    if (loginType === 'email') {
+      identifier = email;
     } else {
-      setError(data.error || 'Credenziali non valide');
+      const cleanPhone = phone.replace(/\s/g, '');
+      identifier = `+39${cleanPhone}`;
     }
-  } catch (err) {
-    setError('Errore di connessione');
-  } finally {
-    setLoading(false);
-  }
-};
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        if (onSuccess) {
+          onSuccess(data.user);
+        }
+      } else {
+        setError(data.error || 'Credenziali non valide');
+      }
+    } catch (err) {
+      setError('Errore di connessione');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
@@ -134,9 +134,17 @@ const handleSubmit = async (e: React.FormEvent) => {
             )}
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Password
+                </label>
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  Password dimenticata?
+                </Link>
+              </div>
               <input
                 id="password"
                 name="password"
