@@ -1,63 +1,71 @@
-import { getDb } from '@/lib/db';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import jwt from 'jsonwebtoken';
+import { getDb } from '@/lib/db';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const sql = getDb();
-    const { phone, name, userId } = await request.json();
+    const body = await request.json();
+    const { rione, phone: guestPhone } = body;
 
-    if (!phone) {
+    if (!rione) {
+      return NextResponse.json({ error: 'Rione mancante' }, { status: 400 });
+    }
+
+    const token = request.cookies.get('auth-token')?.value;
+
+    let userId: number | null = null;
+    let phone: string;
+    let voterType: 'registered' | 'guest';
+
+    if (token) {
+      // Utente loggato: prendi phone dal profilo
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number };
+        const userRows = await sql`
+          SELECT id, phone FROM users WHERE id = ${decoded.userId}
+        `;
+        const users = Array.isArray(userRows) ? userRows : [];
+        if (users.length === 0) {
+          return NextResponse.json({ error: 'Utente non trovato' }, { status: 404 });
+        }
+        userId = users[0].id;
+        phone = users[0].phone;
+        voterType = 'registered';
+      } catch {
+        return NextResponse.json({ error: 'Token non valido' }, { status: 401 });
+      }
+    } else {
+      // Ospite: serve il phone nel body
+      if (!guestPhone) {
+        return NextResponse.json({ error: 'Numero di telefono richiesto' }, { status: 400 });
+      }
+      phone = guestPhone.trim();
+      voterType = 'guest';
+    }
+
+    // Check se phone ha già votato
+    const existing = await sql`
+      SELECT id, rione FROM voters WHERE phone = ${phone} LIMIT 1
+    `;
+    const existingRows = Array.isArray(existing) ? existing : [];
+    if (existingRows.length > 0) {
       return NextResponse.json(
-        { error: 'Numero di telefono richiesto' },
-        { status: 400 }
+        { error: 'Questo numero ha già votato', alreadyVoted: true, rione: existingRows[0].rione },
+        { status: 409 }
       );
     }
 
-    const checkResult = await sql`
-      SELECT * FROM voters WHERE phone = ${phone}
+    // Inserisci voto
+    await sql`
+      INSERT INTO voters (phone, user_id, rione, voter_type, voted_at, has_voted)
+      VALUES (${phone}, ${userId}, ${rione}, ${voterType}, NOW(), TRUE)
     `;
 
-    const existingVoter = Array.isArray(checkResult) ? checkResult : [];
-
-    if (existingVoter.length > 0) {
-      const updateResult = await sql`
-        UPDATE voters 
-        SET has_voted = true, 
-            voted_at = NOW(),
-            updated_at = NOW()
-        WHERE phone = ${phone}
-        RETURNING *
-      `;
-      
-      const updated = Array.isArray(updateResult) ? updateResult : [];
-      
-      return NextResponse.json({ 
-        success: true,
-        message: 'Voto registrato',
-        voter: updated[0] 
-      });
-    }
-
-    const voterType = userId ? 'registered' : 'guest';
-    const insertResult = await sql`
-      INSERT INTO voters (phone, user_id, name, has_voted, voted_at, voter_type)
-      VALUES (${phone}, ${userId || null}, ${name || null}, true, NOW(), ${voterType})
-      RETURNING *
-    `;
-
-    const inserted = Array.isArray(insertResult) ? insertResult : [];
-
-    return NextResponse.json({ 
-      success: true,
-      message: 'Voto registrato',
-      voter: inserted[0] 
-    }, { status: 201 });
-
-  } catch (error: any) {
-    console.error('Errore registrazione voto:', error);
-    return NextResponse.json(
-      { error: 'Errore durante la registrazione del voto' },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: true, rione });
+  } catch (error) {
+    console.error('Errore voto:', error);
+    return NextResponse.json({ error: 'Errore server' }, { status: 500 });
   }
 }

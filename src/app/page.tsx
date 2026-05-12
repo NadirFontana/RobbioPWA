@@ -16,6 +16,7 @@ import MediaSocial from "@/components/SocialMedia";
 import Contatti from "@/components/Contatti";
 import RegisterForm from "@/components/RegisterForm";
 import LoginForm from "@/components/LoginForm";
+import Profilo from "@/components/Profilo";
 
 // Import dinamico per evitare SSR di R3F (Three.js richiede window/WebGL)
 const MirosAdventure = dynamic(
@@ -173,7 +174,7 @@ export default function Home() {
       case "accedi":
         return <LoginForm onSuccess={(userData) => { setUser(userData); setActiveSection('home'); }} />;
       case "profilo":
-        return <div className="p-8 text-center">Pagina Profilo (in sviluppo)</div>;
+        return <Profilo user={user} />;
       case "admin":
         return <div className="p-8 text-center">Dashboard Admin (in sviluppo)</div>;
       case "mirosadventure":
@@ -236,7 +237,7 @@ export default function Home() {
 
       {!isFullscreen && (
         <footer className="mt-auto text-center py-4 text-sm text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-          © 2025 Palio d'Urmon — Tutti i diritti riservati.
+          © 2025 Palio d&apos;Urmon — Tutti i diritti riservati.
         </footer>
       )}
     </div>

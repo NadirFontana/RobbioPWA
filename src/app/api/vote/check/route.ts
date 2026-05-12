@@ -1,46 +1,42 @@
-import { getDb } from '@/lib/db';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import jwt from 'jsonwebtoken';
+import { getDb } from '@/lib/db';
 
-export async function POST(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const sql = getDb();
-    const { phone } = await request.json();
+    const token = request.cookies.get('auth-token')?.value;
 
-    if (!phone) {
-      return NextResponse.json(
-        { error: 'Numero di telefono richiesto' },
-        { status: 400 }
-      );
+    if (!token) {
+      return NextResponse.json({ voted: false, rione: null });
     }
 
-    const result = await sql`
-      SELECT has_voted, voted_at, name FROM voters WHERE phone = ${phone}
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: number };
+
+    const userRows = await sql`
+      SELECT id, phone FROM users WHERE id = ${decoded.userId}
     `;
-
-    const voters = Array.isArray(result) ? result : [];
-
-    if (voters.length === 0) {
-      return NextResponse.json({ 
-        hasVoted: false,
-        canVote: true,
-        message: 'Numero non trovato, può votare' 
-      });
+    const users = Array.isArray(userRows) ? userRows : [];
+    if (users.length === 0) {
+      return NextResponse.json({ voted: false, rione: null });
     }
 
-    const voter = voters[0] as any;
+    const { phone } = users[0];
 
-    return NextResponse.json({ 
-      hasVoted: voter.has_voted,
-      canVote: !voter.has_voted,
-      votedAt: voter.voted_at,
-      name: voter.name
-    });
+    const voteRows = await sql`
+      SELECT rione FROM voters
+      WHERE user_id = ${decoded.userId} OR phone = ${phone}
+      LIMIT 1
+    `;
+    const votes = Array.isArray(voteRows) ? voteRows : [];
 
-  } catch (error) {
-    console.error('Errore verifica voto:', error);
-    return NextResponse.json(
-      { error: 'Errore durante la verifica' },
-      { status: 500 }
-    );
+    if (votes.length === 0) {
+      return NextResponse.json({ voted: false, rione: null });
+    }
+
+    return NextResponse.json({ voted: true, rione: votes[0].rione });
+  } catch {
+    return NextResponse.json({ voted: false, rione: null });
   }
 }
