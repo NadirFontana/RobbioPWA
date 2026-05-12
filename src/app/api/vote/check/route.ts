@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { getDb } from '@/lib/db';
+import { normalizePhone } from '@/lib/phone';
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,11 +23,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ voted: false, rione: null });
     }
 
-    const { phone } = users[0];
+    const userPhone = normalizePhone(users[0].phone) || users[0].phone;
 
     const voteRows = await sql`
       SELECT rione FROM voters
-      WHERE user_id = ${decoded.userId} OR phone = ${phone}
+      WHERE user_id = ${decoded.userId} OR phone = ${userPhone}
       LIMIT 1
     `;
     const votes = Array.isArray(voteRows) ? voteRows : [];

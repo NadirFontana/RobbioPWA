@@ -12,13 +12,19 @@ interface Rione {
   gradientTo: string;
 }
 
+interface User {
+  id: number;
+  phone: string;
+  name: string;
+}
+
 export default function Rioni() {
   const [expandedRione, setExpandedRione] = useState<number | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [votedRione, setVotedRione] = useState<string | null>(null);
   const [voteLoading, setVoteLoading] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
-  const [guestModalRione, setGuestModalRione] = useState<string | null>(null);
+  const [voteModalRione, setVoteModalRione] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
   const rioni: Rione[] = [
@@ -32,14 +38,18 @@ export default function Rioni() {
     { id: 8, nome: "Canton Balin", colori: ["#1F2937", "#FFFFFF"], vittorie: 0, gradientFrom: "from-gray-800", gradientTo: "to-white" },
   ];
 
-  // Check login + voto al mount
   const checkStatus = useCallback(async () => {
     setChecking(true);
     try {
       const meRes = await fetch("/api/auth/me");
-      setIsLoggedIn(meRes.ok);
+      if (meRes.ok) {
+        const data = await meRes.json();
+        setCurrentUser(data.user);
+      } else {
+        setCurrentUser(null);
+      }
     } catch {
-      setIsLoggedIn(false);
+      setCurrentUser(null);
     }
     try {
       const voteRes = await fetch("/api/vote/check");
@@ -60,38 +70,8 @@ export default function Rioni() {
     setTimeout(() => setFeedback(null), 3500);
   };
 
-  // Voto utente loggato
-  const voteAsUser = async (rione: string) => {
-    setVoteLoading(rione);
-    try {
-      const res = await fetch("/api/vote/mark-voted", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rione }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        if (data.alreadyVoted) {
-          setVotedRione(data.rione);
-          showFeedback("error", `Hai già votato per ${data.rione}`);
-        } else {
-          showFeedback("error", data.error || "Errore voto");
-        }
-        return;
-      }
-      setVotedRione(rione);
-      showFeedback("success", `Voto per ${rione} registrato!`);
-    } catch {
-      showFeedback("error", "Errore di rete");
-    } finally {
-      setVoteLoading(null);
-    }
-  };
-
-  // Voto ospite (dopo aver inserito telefono)
-  const voteAsGuest = async (phone: string) => {
-    if (!guestModalRione) return;
-    const rione = guestModalRione;
+  // Invio voto (usato sia da loggato che da ospite)
+  const submitVote = async (rione: string, phone: string) => {
     setVoteLoading(rione);
     try {
       const res = await fetch("/api/vote/mark-voted", {
@@ -103,12 +83,12 @@ export default function Rioni() {
       if (!res.ok) {
         if (data.alreadyVoted) {
           setVotedRione(data.rione);
-          throw new Error(`Questo numero ha già votato per ${data.rione}`);
+          throw new Error(data.error || `Questo numero ha già votato`);
         }
         throw new Error(data.error || "Errore voto");
       }
       setVotedRione(rione);
-      setGuestModalRione(null);
+      setVoteModalRione(null);
       showFeedback("success", `Voto per ${rione} registrato!`);
     } finally {
       setVoteLoading(null);
@@ -116,10 +96,14 @@ export default function Rioni() {
   };
 
   const handleVoteClick = (rione: string) => {
-    if (isLoggedIn) {
-      voteAsUser(rione);
+    // Se loggato: vota direttamente col numero del profilo
+    if (currentUser?.phone) {
+      submitVote(rione, currentUser.phone).catch((err) => {
+        showFeedback("error", err.message || "Errore voto");
+      });
     } else {
-      setGuestModalRione(rione);
+      // Ospite: apri modale per inserire telefono
+      setVoteModalRione(rione);
     }
   };
 
@@ -133,7 +117,6 @@ export default function Rioni() {
         Rioni
       </h1>
 
-      {/* Feedback toast */}
       {feedback && (
         <div
           className={`fixed top-20 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-white font-medium transition ${
@@ -156,7 +139,6 @@ export default function Rioni() {
               className={`relative rounded-2xl p-[5px] bg-gradient-to-br ${rione.gradientFrom} ${rione.gradientTo} shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]`}
             >
               <div className="bg-white dark:bg-gray-800 rounded-[13px] overflow-hidden h-full flex flex-col">
-                {/* Header */}
                 <button
                   onClick={() => toggleRione(rione.id)}
                   className="w-full px-4 py-3 flex justify-between items-center border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
@@ -177,7 +159,6 @@ export default function Rioni() {
                 </button>
 
                 <div className="p-6 flex-1 flex flex-col">
-                  {/* Stemma */}
                   <div className="flex justify-center mb-5">
                     <div className={`w-24 h-28 bg-gradient-to-b ${rione.gradientFrom} ${rione.gradientTo} rounded-lg flex items-center justify-center shadow-md`}>
                       <svg className="w-12 h-12 text-white/40" fill="currentColor" viewBox="0 0 20 20">
@@ -187,7 +168,6 @@ export default function Rioni() {
                     </div>
                   </div>
 
-                  {/* Vittorie */}
                   <div className="text-center mb-5">
                     <p className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-medium">
                       Vittorie
@@ -197,7 +177,6 @@ export default function Rioni() {
                     </p>
                   </div>
 
-                  {/* Bottone voto */}
                   <div className="mt-auto">
                     {checking ? (
                       <div className="w-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 font-medium py-2 rounded-lg text-center text-sm animate-pulse">
@@ -218,7 +197,6 @@ export default function Rioni() {
                     )}
                   </div>
 
-                  {/* Espandibile */}
                   {expandedRione === rione.id && (
                     <div className="mt-6 pt-5 border-t border-gray-200 dark:border-gray-700 animate-fadeIn">
                       <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
@@ -235,11 +213,11 @@ export default function Rioni() {
         })}
       </div>
 
-      {guestModalRione && (
+      {voteModalRione && (
         <GuestVoteModal
-          rione={guestModalRione}
-          onConfirm={voteAsGuest}
-          onCancel={() => setGuestModalRione(null)}
+          rione={voteModalRione}
+          onConfirm={(phone) => submitVote(voteModalRione, phone)}
+          onCancel={() => setVoteModalRione(null)}
         />
       )}
     </div>
